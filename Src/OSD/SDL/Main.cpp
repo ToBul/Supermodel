@@ -1887,6 +1887,9 @@ static void Help(void)
   puts("  -simulate-netboard      Simulate the net board [Default]");
   puts("  -emulate-netboard       Emulate the net board (requires -no-threads)");
   puts("");
+  puts("Dip Switch Options:");
+  puts("  -dipswitch=<s>          Dip switch array 1-8 (active low 0=on 1=off))");
+  puts("");
   puts("Input Options:");
   puts("  -force-feedback         Enable force feedback (DirectInput, XInput)");
   puts("  -config-inputs          Configure keyboards, mice, and game controllers");
@@ -2167,6 +2170,61 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
                   cmd_line.error = true;
               }
           }
+      }
+      else if (arg.find("-dipswitch=") == 0)
+      {
+        std::vector<std::string> parts = Util::Format(arg).Split('=');
+
+        if (parts.size() != 2)
+        {
+            ErrorLog("'-dipswitch' requires an 8 digit binary string (e.g., '-dipswitch=11110000').");
+            cmd_line.error = true;
+        }
+        else
+        {
+            std::string dipStr = parts[1];
+
+            if (dipStr.length() != 8)
+            {
+                ErrorLog("DIP Switch Error: Value must be exactly 8 digits long.");
+                cmd_line.error = true;
+            }
+            else
+            {
+                UINT8 dipSwitchByte = 0x00;
+                bool invalidDipChar = false;
+
+                for (int i = 0; i < 8; ++i)
+                {
+                    char currentChar = dipStr[7 - i];
+
+                    if (currentChar == '1')
+                    {
+                        dipSwitchByte |= (1 << i);
+                    }
+                    else if (currentChar == '0')
+                    {
+                        // Bit is already 0, no action needed
+                    }
+                    else
+                    {
+                        ErrorLog("DIP Switch Error: Invalid character '%c' found. Only '0' and '1' are allowed.", currentChar);
+                        invalidDipChar = true;
+                        break;
+                    }
+                }
+
+                if (invalidDipChar)
+                {
+                    cmd_line.error = true;
+                }
+                else
+                {
+                    cmd_line.config.Set("DipSwitchByte", (unsigned)dipSwitchByte);
+                    printf("\ndip switch override %s return byte: 0x%02X\n\n", dipStr.c_str(), (unsigned)dipSwitchByte);
+                }
+            }
+        }
       }
       else if (arg == "-true-hz")
         cmd_line.config.Set("RefreshRate", 57.524f);

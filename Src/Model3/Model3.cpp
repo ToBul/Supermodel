@@ -561,6 +561,12 @@ UINT8 CModel3::ReadInputs(unsigned reg)
       {
           data = 0x01;
       }
+      if (m_config["DipSwitchByte"].Exists())
+      {
+        data = m_config["DipSwitchByte"].template ValueAs<unsigned>();
+
+        // printf("Successfully loaded hex switch state: 0x%02X\n", data);
+      }
       return data;
 
   case 0x2C:  // Serial FIFO 1

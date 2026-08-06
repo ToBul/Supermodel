@@ -1887,8 +1887,9 @@ static void Help(void)
   puts("  -simulate-netboard      Simulate the net board [Default]");
   puts("  -emulate-netboard       Emulate the net board (requires -no-threads)");
   puts("");
-  puts("Dip Switch Options:");
-  puts("  -machine-dips=<s>       Dip switch array 1-8 (active low 0=on 1=off)");
+  puts("DIP Switch Options:");
+  puts("  -machine-dips=<s>       Machine DIP switches 1-8 (active low 0=on 1=off)");
+  puts("  -billboard-dips=<s>     Billboard DIP switches 1-8 (1=on 0=off)");
   puts("");
   puts("Input Options:");
   puts("  -force-feedback         Enable force feedback (DirectInput, XInput)");
@@ -2222,6 +2223,61 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
                 {
                     cmd_line.config.Set("MachineDipSwitch", (unsigned)dipSwitchByte);
                     printf("\ndip switch override %s return byte: 0x%02X\n\n", dipStr.c_str(), (unsigned)dipSwitchByte);
+                }
+            }
+        }
+      }
+      else if (arg.find("-billboard-dips=") == 0)
+      {
+        std::vector<std::string> parts = Util::Format(arg).Split('=');
+
+        if (parts.size() != 2)
+        {
+            ErrorLog("'-billboard-dips=' requires an 8 digit binary string (e.g., '-billboard-dips=10000000').");
+            cmd_line.error = true;
+        }
+        else
+        {
+            std::string billDipStr = parts[1];
+
+            if (billDipStr.length() != 8)
+            {
+                ErrorLog("Billboard DIP Switch Error: Value must be exactly 8 digits long.");
+                cmd_line.error = true;
+            }
+            else
+            {
+                UINT8 billDipSwitchByte = 0x00;
+                bool invalidDipChar = false;
+
+                for (int i = 0; i < 8; ++i)
+                {
+                    char currentChar = billDipStr[i]; 
+
+                    if (currentChar == '1')
+                    {
+                        billDipSwitchByte |= (1 << (7 - i)); 
+                    }
+                    else if (currentChar == '0')
+                    {
+                        // Bit is already 0, no action needed
+                    }
+                    else
+                    {
+                        ErrorLog("Billboard DIP Switch Error: Invalid character '%c' found. Only '0' and '1' are allowed.", currentChar);
+                        invalidDipChar = true;
+                        break;
+                    }
+                }
+
+                if (invalidDipChar)
+                {
+                    cmd_line.error = true;
+                }
+                else
+                {
+                    cmd_line.config.Set("BillboardDipSwitch", (unsigned)billDipSwitchByte);
+                    printf("\n   Billboard DIP switch override %s return byte: 0x%02X\n\n", billDipStr.c_str(), (unsigned)billDipSwitchByte);
                 }
             }
         }

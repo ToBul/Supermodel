@@ -109,7 +109,11 @@ UINT8 CBillBoard::IORead8(UINT32 portNum)
   {
   case 0x20:
     // return the dipswitch
-    // 0x80 : test all segments
+    // 0x80: 10000000 DIP 1 on tests all segments
+    if (m_config["BillboardDipSwitch"].Exists())
+    {
+      m_dip1 = m_config["BillboardDipSwitch"].template ValueAs<unsigned>();
+    }
     return m_dip1;
   case 0x21:
     //DebugLog("     Bill R portnum=%X  m_dataSent=%X\n", portNum, m_dataSent);
@@ -179,7 +183,7 @@ void CBillBoard::IOWrite8(UINT32 portNum, UINT8 data)
 CBillBoard::CBillBoard(const Util::Config::Node& config)
   : CDriveBoard(config)
 {
-  m_dip1 = 0x0f;
+  m_dip1 = 0x00;
   m_simulated = false;
   m_z80Clock = 8.0f;
   m_z80NMI = false;

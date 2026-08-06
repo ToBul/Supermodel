@@ -2187,7 +2187,7 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
 
             if (dipStr.length() != 8)
             {
-                ErrorLog("DIP Switch Error: Value must be exactly 8 digits long.");
+                ErrorLog("nMachine DIP Switch Error: Value must be exactly 8 digits long.");
                 cmd_line.error = true;
             }
             else
@@ -2209,7 +2209,7 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
                     }
                     else
                     {
-                        ErrorLog("DIP Switch Error: Invalid character '%c' found. Only '0' and '1' are allowed.", currentChar);
+                        ErrorLog("nMachine DIP Switch Error: Invalid character '%c' found. Only '0' and '1' are allowed.", currentChar);
                         invalidDipChar = true;
                         break;
                     }
@@ -2222,7 +2222,7 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
                 else
                 {
                     cmd_line.config.Set("MachineDipSwitch", (unsigned)dipSwitchByte);
-                    printf("\ndip switch override %s return byte: 0x%02X\n\n", dipStr.c_str(), (unsigned)dipSwitchByte);
+                    printf("\nMachine DIP switch override %s return byte: 0x%02X\n\n", dipStr.c_str(), (unsigned)dipSwitchByte);
                 }
             }
         }
@@ -2277,7 +2277,7 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
                 else
                 {
                     cmd_line.config.Set("BillboardDipSwitch", (unsigned)billDipSwitchByte);
-                    printf("\n   Billboard DIP switch override %s return byte: 0x%02X\n\n", billDipStr.c_str(), (unsigned)billDipSwitchByte);
+                    printf("\nBillboard DIP switch override %s return byte: 0x%02X\n\n", billDipStr.c_str(), (unsigned)billDipSwitchByte);
                 }
             }
         }

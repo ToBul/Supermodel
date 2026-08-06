@@ -555,19 +555,27 @@ UINT8 CModel3::ReadInputs(unsigned reg)
 
     return data;
 
-  case 0x18:         // swtrilgy and getbass. Remove IO board error on getbass. Not sure, but may be related to device feedback ?
-      data = 0x7f;   // Note : when this returned value is wrong, there is a side effect on Ocean Hunter game, a sort of 3d interlaced effect
-      if (m_game.name == "bassdx" || m_game.name == "getbassdx" || m_game.name == "getbass")  // Prevent I/O erreur after a while (related to tension)
-      {
-          data = 0x01;
-      }
-      if (m_config["DipSwitchByte"].Exists())
-      {
-        data = m_config["DipSwitchByte"].template ValueAs<unsigned>();
+  case 0x18: // DIP switches
+    // Byte binary string is DIP 1-8 active low
+    // vs215o, 0x7F 01111111, stats overlay on
+    // Ocean Hunter, 0xDF 11011111, a sort of 3d interlaced effect/glitch (in-game)
+    // lostwsga, 0xDF 11011111, Event Version on
+    // lostwsgp, 0xFE 11111110, stats overlay on
 
-        // printf("Successfully loaded hex switch state: 0x%02X\n", data);
-      }
-      return data;
+    data = 0xFF;
+
+    if (m_game.name == "bassdx" || m_game.name == "getbassdx" || m_game.name == "getbass")
+    {
+      // 0x3F 00111111, prevent boot up (DIP1) and in-game (DIP2) I/O errors
+      data = 0x3F;
+    }
+
+    if (m_config["MachineDipSwitch"].Exists())
+    {
+      data = m_config["MachineDipSwitch"].template ValueAs<unsigned>();
+    }
+
+    return data;
 
   case 0x2C:  // Serial FIFO 1
     return serialFIFO1;

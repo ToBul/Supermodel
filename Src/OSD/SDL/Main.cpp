@@ -1888,7 +1888,7 @@ static void Help(void)
   puts("  -emulate-netboard       Emulate the net board (requires -no-threads)");
   puts("");
   puts("Dip Switch Options:");
-  puts("  -dipswitch=<s>          Dip switch array 1-8 (active low 0=on 1=off))");
+  puts("  -machine-dips=<s>       Dip switch array 1-8 (active low 0=on 1=off)");
   puts("");
   puts("Input Options:");
   puts("  -force-feedback         Enable force feedback (DirectInput, XInput)");
@@ -2171,13 +2171,13 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
               }
           }
       }
-      else if (arg.find("-dipswitch=") == 0)
+      else if (arg.find("-machine-dips=") == 0)
       {
         std::vector<std::string> parts = Util::Format(arg).Split('=');
 
         if (parts.size() != 2)
         {
-            ErrorLog("'-dipswitch' requires an 8 digit binary string (e.g., '-dipswitch=11110000').");
+            ErrorLog("'-machine-dips' requires an 8 digit binary string (e.g., '-machine-dips=11110000').");
             cmd_line.error = true;
         }
         else
@@ -2220,7 +2220,7 @@ static ParsedCommandLine ParseCommandLine(int argc, char **argv)
                 }
                 else
                 {
-                    cmd_line.config.Set("DipSwitchByte", (unsigned)dipSwitchByte);
+                    cmd_line.config.Set("MachineDipSwitch", (unsigned)dipSwitchByte);
                     printf("\ndip switch override %s return byte: 0x%02X\n\n", dipStr.c_str(), (unsigned)dipSwitchByte);
                 }
             }
